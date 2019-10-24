@@ -1,0 +1,46 @@
+1.1
+
+		mistake1 b 10
+		p buf 
+		{-34648,32767,0,0,194,0}
+
+		p buf[2]
+		0
+
+		s
+		return buf
+		p buf
+		{1,1,2,3,4,5}
+
+		p buf[2]
+		2 
+
+		buf ist ein int-Array. Vor Initializierung zeigen die Werte des Arrays auf einen beliebigen Wert.
+		Die Funktions returnt die Adrese der lokale Variable (Compilerwarnung).
+	
+
+		mistake2 b 17
+
+		buf ist ein Pointer, der Speicher allokiert. 1 char -> 1 byte, 4 Bytes werden allokiert. 
+
+
+
+		Es kommt zum Absturz bevor der dritte Breakpoint erreicht wird. Das heißt, dass sich der Fehler des Absturzes vermutlich in der dritten Funktion befindet.
+
+		p mistake2_ 
+		2
+		
+		p buf
+		(int *) 0x500000004
+
+		buf[0] = 3		
+		
+		p buf 
+
+		(int *) 0x4006a7 <mistake2>
+		n
+
+		SIGSEGV
+
+
+
