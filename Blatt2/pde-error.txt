@@ -1,0 +1,43 @@
+Funktion askparams.c:AskParams:
+
+197: sscanf (argV[333], "%d", interlines);
+
+Fehler(Speicherfehler: Invalid Read):
+Der Index 333 liegt nicht im allokierten Bereich von argV und liest daher Speicher
+der nicht dafür bestimmt ist. In diesem Fall führt ein "General Protection Fault" dazu
+dass das Programm abstürzt, da nicht allokierter Speicher benutzt wird.
+
+
+Funktion partdiff-seq.c:initMatrices:
+
+133: Matrix[g][i][j] = 0
+
+Fehler(Speicherfehler: Access not within mapped region):
+Ursache:
+Funktion partdiff-seq.c:allocateMatrices:96: 
+M = malloc (sizeof (double) * (N + 1) * (N - 1) * 2);	/* allocate memory */
+
+Die Ursache liegt darin, das nicht genügend Speicher allokiert wird. 
+Es wird jedoch ebenjener nicht allokierter Speicher in Matrix referenziert.
+Dies führt zu invaliden Lesen von nicht allokierten Speicher und in diesem Fall zum Absturz.
+
+
+Funktion partdiff-seq.c:calculate:
+
+230: Matrix[j - 1][m2][i]
+
+Fehler(Speicherfehler: Access not within mapped region)
+Auf das erste Array wird mit dem Index j - 1 zugegriffen, jedoch wird eben jenes Array nur 
+mit Platz für Indices 0-1 allokiert. Sobald j größer als 2 ist, kann es zu invalidem Lesen 
+von Speicher kommen und damit zum Absturz. 
+
+Funktion partdiff-seq.c:freeMatrices:
+
+165: free (Matrix);
+166: if (Matrix[1] != 0)
+
+Fehler(Speicherfehler: Invalides Lesen):
+Hier wird auf dem Bereich von Matrix zugegriffen, nachdem es deallokiert wurde.
+
+"Fehler"(Nicht vollständig deallokierter Speicher):
+Der dynamisch allokierter Speicher von M ist noch nicht deallokiert worden.

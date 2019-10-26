@@ -1,46 +1,62 @@
-1.1
+Funktion mistake1:
 
-		mistake1 b 10
-		p buf 
-		{-34648,32767,0,0,194,0}
+int buf[] = { 1, 1, 2, 3, 4, 5 };
+return buf;
 
-		p buf[2]
-		0
-
-		s
-		return buf
-		p buf
-		{1,1,2,3,4,5}
-
-		p buf[2]
-		2 
-
-		buf ist ein int-Array. Vor Initializierung zeigen die Werte des Arrays auf einen beliebigen Wert.
-		Die Funktions returnt die Adrese der lokale Variable (Compilerwarnung).
-	
-
-		mistake2 b 17
-
-		buf ist ein Pointer, der Speicher allokiert. 1 char -> 1 byte, 4 Bytes werden allokiert. 
+Fehler (Absturz: Access not within mapped region):
+Stack-allokierter Speicher wird zurückgegeben.
+Zugriff auf jenen Speicher ist invalid und führt zum Absturz.
 
 
+Funktion mistake2:
 
-		Es kommt zum Absturz bevor der dritte Breakpoint erreicht wird. Das heißt, dass sich der Fehler des Absturzes vermutlich in der dritten Funktion befindet.
+int *buf = malloc (sizeof (char) * 4)
 
-		p mistake2_ 
-		2
-		
-		p buf
-		(int *) 0x500000004
-
-		buf[0] = 3		
-		
-		p buf 
-
-		(int *) 0x4006a7 <mistake2>
-		n
-
-		SIGSEGV
+Fehler (Speicherfehler):
+buf wird mit der Vielfache der Größe eines "int" Typs initialisiert, was in diesem Fall
+dazuführt, dass der allokierte Speicher nicht groß genug ist, sodass er korrekt 
+gelesen/beschrieben wird.
 
 
+Funktion mistake3:
 
+int *buf = (int *) &mistake2;
+buf[0] = 3;
+
+Fehler (Absturz: Bad permissions for mapped region):
+Es wird versucht in die Addresse der Funktion mistake2 zu schreiben anstatt der Variabeln mistake2_.
+Pointer von Funktionen unterliegen aber einige Einschränkungen, erlauben wahrscheinlich nicht, dass die
+eigentliche Funktion überschrieben wird.
+
+Fehler(Speicherfehler: Invalides Lesen):
+Stack-allokierter Speicher wird zurückgegeben.
+Führt irgendwie nicht zum Absturz, jedoch zum Lesen von nicht initialisierten Speicher.
+
+
+Funktion mistake4:
+
+buf[4] = 4;
+free (buf);
+
+Fehler(Speicherfehler: Invalides Lesen):
+Der Speicher wird befreit und dann als Pointer zurückgegeben.
+Dies führt dazu, dass freigegebener Speicher gelesen wird, was zwar nicht direkt zum
+Absturz führen muss, jedoch invalid ist, kann also unvorhergesehene Werte lesen.
+
+Fehler(Speicherfehler: Invalides Lesen/Schreiben):
+Die Zahl 4 wird in einem Index gespeichert, der außerhalb des allokierten Speichers liegt.
+Dies führt außerdem dazu das in der darauffolgenden printf Anweisung nicht initialisierter Speicher
+gelesen wird. 
+
+
+Funktion main:
+
+free (p[1]);
+
+Fehler(Speicherfehler: invalid Free):
+Der Pointer an p[1] zeigt nicht auf das nullte sondern erste Element des Buffers.
+Dies führt dazu das der Speicher nicht (ganz) freigegeben werden kann.
+
+Fehlend(Speicherfehler: Leaks):
+Es muss noch jeglicher dynamisch allokierter Speicher freigegeben werden, damit kein Speicher
+"verloren" ("geleaked") wird.
