@@ -1,0 +1,44 @@
+Reading symbols from ./simple...done.
+(gdb) break mistake1
+Breakpoint 1 at 0x400676: file simple.c, line 12.
+(gdb) run
+Starting program: /home/buchhardt/02-gdb-valgrind/simple/simple
+
+Breakpoint 1, mistake1 () at simple.c:12
+12        int buf[] = { 1, 1, 2, 3, 4, 5 };
+(gdb) print buf
+$1 = {-34488, 32767, 0, 0, 194, 0}
+(gdb) print buf[2]
+$2 = 0
+(gdb) whatis buf
+type = int [6]
+(gdb) n
+13        return buf;
+(gdb) print buf
+$3 = {1, 1, 2, 3, 4, 5}
+(gdb) print buf[2]
+$4 = 2
+(gdb) whatis buf
+type = int [6]
+(gdb) break mistake2
+Breakpoint 2 at 0x4006af: file simple.c, line 19.
+(gdb) c
+Continuing.
+
+Breakpoint 2, mistake2 () at simple.c:19
+19        int *buf = malloc (sizeof (char) * 4);
+(gdb) whatis buf
+type = int *
+(gdb) n
+20        buf[2] = 2;
+(gdb) whatis buf
+type = int *
+(gdb) backtrace
+#0  mistake2 () at simple.c:20
+#1  0x000000000040074e in main () at simple.c:47
+(gdb) select-frame 1
+(gdb) print p
+$5 = {0x4, 0x400590 <_start>, 0x7fffffff7a10, 0x0}
+(gdb) p mistake4()
+$6 = (int *) 0x602280
+(gdb)
