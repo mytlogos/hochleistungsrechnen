@@ -13,7 +13,7 @@ Funktion mistake2:
 int *buf = malloc (sizeof (char) * 4)
 
 Fehler (Speicherfehler):
-buf wird mit der Vielfache der Größe eines "int" Typs initialisiert, was in diesem Fall
+buf wird mit der Vielfache der Größe eines "char" Typs initialisiert, was in diesem Fall
 dazuführt, dass der allokierte Speicher nicht groß genug ist, sodass er korrekt 
 gelesen/beschrieben wird.
 
