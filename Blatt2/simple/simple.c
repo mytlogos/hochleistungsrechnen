@@ -1,24 +1,28 @@
-/*
+/* 
 ** simple error demonstration to demonstrate power of valgrind
 ** Julian M. Kunkel - 17.04.2008
 */
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int *
 mistake1 ()
 {
-  int buf[] = { 1, 1, 2, 3, 4, 5 };
+  int *buf = malloc (sizeof (int) * 6);
+  int buf2[] = { 1, 1, 2, 3, 4, 5 };
+  // Geht nicht:
+  //buf = buf2;
+  memcpy(buf, buf2, 6 * sizeof(int));
   return buf;
 }
 
 int *
 mistake2 ()
 {
-  int *buf = malloc (sizeof (char) * 4);
-  buf[2] = 2;
-  printf("%d\n",*buf);
+  int *buf = malloc (sizeof (int) * 2);
+  buf[1] = 2;
   return buf;
 }
 
@@ -26,19 +30,14 @@ int *
 mistake3 ()
 {
   /* In dieser Funktion darf kein Speicher direkt allokiert werden. */
-  //int mistake2_ = 0;
-  int *buf = (int *) &mistake2;
-  buf[0] = 3;
+  int *buf = &mistake1()[3];
   return buf;
 }
 
 int *
 mistake4 ()
 {
-  int *buf = malloc (sizeof (char) * 4);
-  buf[4] = 4;
-  free (buf);
-  return buf;
+  return &mistake1()[4];
 }
 
 int
@@ -52,9 +51,11 @@ main (void)
   printf ("3 %d\n", *p[2]);
   printf ("4 %d\n", *p[3]);
 
-  /* mhh muss hier noch etwas gefreed werden? */
-  /* Fügen sie hier die korrekten aufrufe von free() ein */
-  free (p[1]);			/* welcher Pointer war das doch gleich?, TODO: Fixme... :-) */
+  // TODO FREE?
+  //free (p);			
+  //free (p[1]);			
+  //free (p[1]);			
+  //free (p[1]);			
 
   return 0;
 }
